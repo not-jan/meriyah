@@ -3,6 +3,22 @@ export interface _Node {
   end?: number;
   range?: [number, number];
   loc?: SourceLocation | null;
+  parent?: Node;
+  predecessors?: Array<Edge>;
+  successors?: Array<Edge>;
+  next?: Node;
+}
+
+export enum EdgeType {
+  UNCOND,
+  ON_TRUE,
+  ON_FALSE,
+  SYN
+}
+
+export interface Edge {
+  type: EdgeType;
+  target: Node;
 }
 
 export interface SourceLocation {

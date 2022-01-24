@@ -19,3 +19,4 @@ yarn-error.log*
 .rollupcache
 .fuzz-output
 .DS_Store
+.idea/
