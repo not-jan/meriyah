@@ -3,22 +3,29 @@ export interface _Node {
   end?: number;
   range?: [number, number];
   loc?: SourceLocation | null;
-  parent?: Node;
+  parent?: Reference;
   predecessors?: Array<Edge>;
   successors?: Array<Edge>;
-  next?: Node;
+  next?: Node | null;
+  prev?: Node | null;
 }
 
 export enum EdgeType {
   UNCOND,
   ON_TRUE,
   ON_FALSE,
+  EXCEPTION,
   SYN
 }
 
-export interface Edge {
+export class Edge {
   type: EdgeType;
-  target: Node;
+  target: Node | null;
+
+  constructor(target: Node | null, type: EdgeType) {
+    this.target = target;
+    this.type = type;
+  }
 }
 
 export interface SourceLocation {
@@ -265,6 +272,55 @@ export type Statement =
   | TryStatement
   | VariableDeclaration
   | WithStatement;
+
+export class Reference {
+  get parent(): Node | null {
+    return this._parent;
+  }
+
+  set parent(value: Node | null) {
+    this._parent = value;
+  }
+  get prop(): string {
+    return this._prop;
+  }
+
+  set prop(value: string) {
+    this._prop = value;
+  }
+  get index(): number | null {
+    return this._index;
+  }
+
+  set index(value: number | null) {
+    this._index = value;
+  }
+  private _parent: Node | null;
+  private _prop: string;
+  private _index: number | null;
+
+  constructor(parent: Node | null, prop: string, index: number | null) {
+    this._parent = parent;
+    this._prop = prop;
+    this._index = index;
+  }
+
+  resolve(): Node | undefined {
+    const parentNode = this._parent as Node & {
+      [x: string]: Node | Node[];
+    };
+
+    if (Array.isArray(parentNode[this._prop])) {
+      if (this._index === null) {
+        return undefined;
+      }
+
+      return (parentNode[this._prop] as Node[])[this._index as number];
+    } else {
+      return parentNode[this._prop] as Node;
+    }
+  }
+}
 
 interface ClassDeclarationBase extends _Node {
   id: Identifier | null;

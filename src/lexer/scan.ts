@@ -186,7 +186,8 @@ export function nextToken(parser: ParserState, context: Context): void {
       end: {
         line: parser.line,
         column: parser.column
-      }
+      },
+      source: parser.source.slice(parser.startPos, parser.index)
     };
     parser.onToken(convertTokenType(parser.token), parser.tokenPos, parser.index, loc);
   }
